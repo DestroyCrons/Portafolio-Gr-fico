@@ -37,7 +37,8 @@ export async function POST(request: Request) {
         .toBuffer()
     : source;
 
-  const metadata = isImage ? await sharp(optimized).metadata() : {};
+  const metadata: Awaited<ReturnType<typeof sharp.prototype.metadata>> | Record<string, never> =
+    isImage ? await sharp(optimized).metadata() : {};
   const extension = isImage ? "webp" : file.name.split(".").pop() ?? "mp4";
   const mediaType = isImage ? "image" : "video";
   const path = `${folder}/${context.user.id}/${crypto.randomUUID()}.${extension}`;
