@@ -4,15 +4,31 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getPublishedProjectBySlug, getPublishedProjects } from "@/lib/cms/queries";
+import { getPublishedProjectBySlug } from "@/lib/cms/queries";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { defaultProjects } from "@/lib/cms/defaults";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }> | { slug: string };
 };
 
 export async function generateStaticParams() {
-  const projects = await getPublishedProjects();
-  return projects.map((project) => ({ slug: project.slug }));
+  // Cannot use cookies() at build time — use a cookieless Supabase client
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    return defaultProjects.map((p) => ({ slug: p.slug }));
+  }
+
+  const supabase = createSupabaseClient(url, key);
+  const { data } = await supabase
+    .from("projects")
+    .select("slug")
+    .eq("status", "published")
+    .eq("visible", true);
+
+  return (data ?? []).map((row: { slug: string }) => ({ slug: row.slug }));
 }
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
@@ -93,4 +109,3 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     </main>
   );
 }
-
