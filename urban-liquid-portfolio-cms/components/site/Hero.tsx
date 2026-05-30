@@ -30,7 +30,7 @@ export function Hero({ content }: HeroProps) {
             initial={{ opacity: 0, y: 50, filter: "blur(18px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.1 }}
-            className="mt-6 max-w-6xl font-display text-[clamp(4.4rem,15vw,14rem)] uppercase leading-[0.78] text-chrome"
+            className="mt-6 max-w-6xl font-display text-[clamp(4.4rem,15vw,14rem)] uppercase leading-[0.85] text-chrome pt-2 pb-1"
           >
             {content.headline}
           </motion.h1>
@@ -65,4 +65,3 @@ export function Hero({ content }: HeroProps) {
     </section>
   );
 }
-
