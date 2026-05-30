@@ -110,6 +110,9 @@ export type HomeContent = {
     analyticsEnabled: boolean;
     sitemapEnabled: boolean;
   };
+  typography?: {
+    displayFont?: string;
+  };
   seo: {
     title: string;
     description: string;
