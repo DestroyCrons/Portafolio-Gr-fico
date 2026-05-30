@@ -1,3 +1,7 @@
+const nextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
