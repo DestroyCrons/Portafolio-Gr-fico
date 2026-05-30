@@ -2,8 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Google Fonts: fuentes display disponibles ── */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Bebas+Neue&family=Anton&family=Oswald:wght@700&family=Rajdhani:wght@700&family=Space+Grotesk:wght@700&family=Syne:wght@700;800&display=swap');
+
 :root {
-  --font-display: "Arial Narrow", "Impact", sans-serif;
+  --font-display: "Bebas Neue", "Arial Narrow", "Impact", sans-serif;
   --font-body: "Inter", "Segoe UI", Arial, sans-serif;
   --bg: #090a0c;
   --fg: #f3f0e8;
@@ -95,6 +98,12 @@ button {
   color: transparent;
   background: linear-gradient(90deg, #f3f0e8, #8ff7ff 28%, #d6d9e1 58%, #b4ff3d 100%);
   background-clip: text;
+}
+
+/* ── Fix: evita que las letras se corten con leading comprimido ── */
+.font-display {
+  overflow: visible;
+  padding-bottom: 0.08em;
 }
 
 .spray-mask {
