@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
-import { Eye, RotateCcw, RotateCw, Save, Send } from "lucide-react";
+import { Eye, RotateCcw, RotateCw, Save, Send, Type } from "lucide-react";
 import { toast } from "sonner";
 import { publishHomeAction, saveHomeDraftAction } from "@/app/(admin)/admin/homepage/actions";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,18 @@ import { useAutosave } from "@/hooks/useAutosave";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { HomeContent, Project } from "@/lib/cms/types";
 import { useAdminStore } from "@/store/admin-store";
+
+// Fuentes display disponibles (cargadas en globals.css)
+const DISPLAY_FONTS = [
+  { label: "Bebas Neue", value: "'Bebas Neue', sans-serif", preview: "BEBAS NEUE" },
+  { label: "Anton", value: "'Anton', sans-serif", preview: "ANTON" },
+  { label: "Barlow Condensed", value: "'Barlow Condensed', sans-serif", preview: "BARLOW CONDENSED" },
+  { label: "Oswald", value: "'Oswald', sans-serif", preview: "OSWALD" },
+  { label: "Rajdhani", value: "'Rajdhani', sans-serif", preview: "RAJDHANI" },
+  { label: "Syne", value: "'Syne', sans-serif", preview: "SYNE" },
+  { label: "Space Grotesk", value: "'Space Grotesk', sans-serif", preview: "SPACE GROTESK" },
+  { label: "Arial Narrow (default)", value: "'Arial Narrow', Impact, sans-serif", preview: "ARIAL NARROW" },
+];
 
 export function HomeEditor({
   initialHome,
@@ -48,6 +60,10 @@ export function HomeEditor({
   function publish() {
     startTransition(async () => {
       await publishHomeAction(home);
+      // Apply the selected font globally when publishing
+      if (home.typography?.displayFont) {
+        document.documentElement.style.setProperty("--font-display", home.typography.displayFont);
+      }
       toast.success("Homepage published.");
     });
   }
@@ -68,6 +84,8 @@ export function HomeEditor({
     onRedo: applyRedo,
     onPreview: () => setPreviewMode(!previewMode)
   });
+
+  const currentFont = home.typography?.displayFont ?? DISPLAY_FONTS[0].value;
 
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
@@ -169,6 +187,47 @@ export function HomeEditor({
               />
             </div>
           </div>
+        </GlassPanel>
+
+        {/* ── TIPOGRAFÍA ── */}
+        <GlassPanel className="p-5">
+          <div className="flex items-center gap-2 mb-5">
+            <Type className="h-4 w-4 text-cyan" />
+            <p className="font-display text-3xl uppercase text-white">Tipografía</p>
+          </div>
+          <Label>Fuente display (títulos grandes)</Label>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {DISPLAY_FONTS.map((font) => {
+              const isActive = currentFont === font.value;
+              return (
+                <button
+                  key={font.value}
+                  onClick={() =>
+                    updateHome((current) => ({
+                      ...current,
+                      typography: { ...current.typography, displayFont: font.value }
+                    }))
+                  }
+                  className={`flex flex-col gap-1 rounded-[8px] border px-4 py-3 text-left transition ${
+                    isActive
+                      ? "border-cyan bg-cyan/10 text-white"
+                      : "border-white/10 bg-white/4 text-white/60 hover:border-white/30 hover:text-white"
+                  }`}
+                >
+                  <span
+                    style={{ fontFamily: font.value }}
+                    className="text-2xl uppercase leading-none"
+                  >
+                    {font.preview}
+                  </span>
+                  <span className="text-xs opacity-60">{font.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-white/40">
+            El cambio se aplica al publicar. Previsualiza en el panel derecho.
+          </p>
         </GlassPanel>
 
         <GlassPanel className="p-5">
@@ -288,8 +347,16 @@ export function HomeEditor({
             </Button>
           </div>
           <div className="rounded-[8px] border border-white/10 bg-black p-4">
-            <p className="font-display text-xs uppercase text-cyan">{home.hero.eyebrow}</p>
-            <h3 className="mt-3 font-display text-5xl uppercase leading-[0.86] text-chrome">
+            <p
+              style={{ fontFamily: currentFont }}
+              className="text-xs uppercase text-cyan"
+            >
+              {home.hero.eyebrow}
+            </p>
+            <h3
+              style={{ fontFamily: currentFont }}
+              className="mt-3 text-5xl uppercase leading-[0.9] text-chrome overflow-visible pb-1"
+            >
               {home.hero.headline}
             </h3>
             <p className="mt-4 text-sm leading-6 text-white/62">{home.hero.subheadline}</p>
@@ -312,4 +379,3 @@ export function HomeEditor({
     </div>
   );
 }
-
